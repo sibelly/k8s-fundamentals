@@ -2,6 +2,8 @@
 
 - Full cycle live -> https://www.youtube.com/watch?v=oxWEVQP5_Rg
 
+![k8s-scheme](https://github.com/sibelly/k8s-fundamentals/blob/main/resources/k8s-scheme.png?raw=true)
+
 ### Tools
 - [kind](https://kind.sigs.k8s.io/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
