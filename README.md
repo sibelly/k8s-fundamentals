@@ -25,3 +25,6 @@
 
 ## Create ReplicaSet
 ```kubectl apply -f replicaset.yaml```
+
+## Create Deployment
+```kubectl apply -f deployment.yaml ```
