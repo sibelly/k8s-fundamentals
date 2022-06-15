@@ -15,10 +15,13 @@
 
 ```kubectl get nodes```
 
-## Create pod
+## Create Pod
 
 ```kubectl apply -f pod.yaml```
 
 ```kubectl get pods```
 
 ```kubectl port-forward pod/nginx-demo 9090:80```
+
+## Create ReplicaSet
+```kubectl apply -f replicaset.yaml```
