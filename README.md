@@ -34,3 +34,30 @@ Menor unidade, agrupamento de containers que compartilham do mesmo namespace (do
 
 ## Create Deployment
 ```kubectl apply -f deployment.yaml ```
+
+### Docker basics
+
+- Stop all processes from running containers with
+
+```
+- docker stop $(docker ps -a -q)
+```
+
+- Remove stopped containers.
+```
+docker rm $(docker ps -a -q)
+
+docker rm -f some-control-plane
+```
+- Remove images
+```
+docker rmi $(docker images -q)
+```
+
+### k8s
+```
+kubectl config delete-cluster kind-sibops
+kubectl config delete-context kind-sibops
+
+kind create cluster --config kind-cluster.yaml --name sibops
+```
