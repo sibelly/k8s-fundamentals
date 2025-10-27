@@ -3,7 +3,7 @@ name: Manage Ingress Controller instances
 on:
   workflow_dispatch:
 jobs:
-  test-and-deploy:
+  deploy-ingress-with-custom-http-snippet-config-map:
     runs-on: ubuntu-latest
     environment: ingress-nginx
     steps:
@@ -18,10 +18,20 @@ jobs:
       - name: Verify cluster
         run: kubectl get nodes
 
-      - name: format secret http-snippet
+      - name: Create temporary values file with http-snippet
         env:
           HTTP_SNIPPET: ${{ secrets.HTTP_SNIPPET }}
-        run:  SNIPPET_ESCAPED=$(printf "%s" "$HTTP_SNIPPET" | sed ':a;N;$!ba;s/\n/\\n/g')
+        run: |
+          echo "Creating temporary secret values file..."
+          cat > /tmp/secret-values.yaml <<EOF
+          controller:
+            config:
+              http-snippet: |
+          $(echo "$HTTP_SNIPPET" | sed 's/^/      /')
+          EOF
+
+          echo "Secret values file created:"
+          cat /tmp/secret-values.yaml | sed 's/./*/g' # hide secret content in logs
 
       - name: Helm install
         run: |
@@ -31,7 +41,7 @@ jobs:
             --create-namespace \
             --version 4.13.2 \
             --values ingress/values.yaml \
-            --set-string controller.config.http-snippet="$SNIPPET_ESCAPED"
+            --values /tmp/secret-values.yaml
 
       - name: Verify install with config map from environment secret
         run: |
