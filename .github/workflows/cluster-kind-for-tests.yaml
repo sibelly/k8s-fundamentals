@@ -23,10 +23,12 @@ jobs:
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace ingress-nginx \
-            --create-namespace
+            --create-namespace \
             --version 4.13.2 \
-            --values ingress/values.yaml
+            --values ingress/values.yaml \
             --set controller.config.http-snippet = ${{ secrets.HTTP_SNIPPET }}
 
       - name: Verify install
-        run: kubectl get all
+        run: |
+          kubectl get all \
+          kubectl get cm
