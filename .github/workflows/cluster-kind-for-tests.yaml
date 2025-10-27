@@ -31,7 +31,7 @@ jobs:
             --create-namespace \
             --version 4.13.2 \
             --values ingress/values.yaml \
-            --set controller.config.http-snippet="$SNIPPET_ESCAPED"
+            --set-string controller.config.http-snippet="$SNIPPET_ESCAPED"
 
       - name: Verify install with config map from environment secret
         run: |
