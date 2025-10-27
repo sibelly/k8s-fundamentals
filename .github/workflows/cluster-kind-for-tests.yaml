@@ -18,30 +18,23 @@ jobs:
       - name: Verify cluster
         run: kubectl get nodes
 
-      - name: Create temporary values file with http-snippet
+      - name: Helm install with secret http-snippet
         env:
           HTTP_SNIPPET: ${{ secrets.HTTP_SNIPPET }}
         run: |
-          echo "Creating temporary secret values file..."
-          cat > /tmp/secret-values.yaml <<EOF
-          controller:
-            config:
-              http-snippet: |
-          $(echo "$HTTP_SNIPPET" | sed 's/^/      /')
-          EOF
-
-          echo "Secret values file created:"
-          cat /tmp/secret-values.yaml | sed 's/./*/g' # hide secret content in logs
-
-      - name: Helm install
-        run: |
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+
+          # Escape newlines as literal \n
+          SNIPPET_ESCAPED=$(printf "%s" "$HTTP_SNIPPET" | awk '{printf "%s\\n", $0}')
+
+          echo "Installing ingress-nginx with http-snippet via --set-string"
+
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace ingress-nginx \
             --create-namespace \
             --version 4.13.2 \
             --values ingress/values.yaml \
-            --values /tmp/secret-values.yaml
+            --set-string controller.config.http-snippet="$SNIPPET_ESCAPED"
 
       - name: Verify install with config map from environment secret
         run: |
