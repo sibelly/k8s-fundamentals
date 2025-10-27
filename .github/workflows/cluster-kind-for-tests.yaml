@@ -33,6 +33,6 @@ jobs:
             --values ingress/values.yaml \
             --set controller.config.http-snippet="$SNIPPET_ESCAPED"
 
-      - name: Verify install
+      - name: Verify install with config map from environment secret
         run: |
-          kubectl get cm -n ingress-nginx
+          kubectl get cm ingress-nginx-controller -o yaml -n ingress-nginx
