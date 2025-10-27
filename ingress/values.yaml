@@ -1,0 +1,5 @@
+controller:
+  allowSnippetAnnotations: true
+  service:
+    annotations:
+      networking.gke.io/load-balancer-type: "External"
