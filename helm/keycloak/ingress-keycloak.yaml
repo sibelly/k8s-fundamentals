@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: keycloak-operator
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /keycloak
+        pathType: Prefix
+        backend:
+          service: 
+            name: keycloak-operator
+            port:
+              number: 30080
