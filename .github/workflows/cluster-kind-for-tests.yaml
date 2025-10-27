@@ -35,5 +35,4 @@ jobs:
 
       - name: Verify install
         run: |
-          kubectl get all \
-          kubectl get cm
+          kubectl get cm -n ingress-nginx
