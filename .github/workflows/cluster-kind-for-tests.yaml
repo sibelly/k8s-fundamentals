@@ -27,7 +27,7 @@ jobs:
           # Escape newlines as literal \n
           SNIPPET_ESCAPED=$(printf "%s" "$HTTP_SNIPPET" | awk '{printf "%s\\n", $0}')
           
-          echo "$HTTP_SNIPPET"
+          echo "######printing scaped -> $SNIPPET_ESCAPED"
 
           echo "Installing ingress-nginx with http-snippet via --set-string"
 
