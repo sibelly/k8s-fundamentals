@@ -23,7 +23,7 @@ jobs:
           HTTP_SNIPPET: ${{ vars.HTTP_SNIPPET }}
         run: |
           # Write the secret value to a temporary file
-          echo "$HTTP_SNIPPET" > snippet.txt
+          echo -e "$SNIPPET_ESCAPED" > snippet.txt
 
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
