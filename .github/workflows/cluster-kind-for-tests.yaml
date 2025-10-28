@@ -20,7 +20,7 @@ jobs:
 
       - name: Helm install with secret http-snippet
         env:
-          HTTP_SNIPPET: ${{ secrets.HTTP_SNIPPET }}
+          HTTP_SNIPPET: ${{ vars.HTTP_SNIPPET }}
         run: |
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
