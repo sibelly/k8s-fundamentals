@@ -27,6 +27,7 @@ jobs:
 
           echo "Installing ingress-nginx with http-snippet via --set-string"
 
+          helm repo add ingress-nginx ingress-nginx/ingress-nginx \
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace ingress-nginx \
             --create-namespace \
