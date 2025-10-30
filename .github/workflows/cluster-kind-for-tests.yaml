@@ -3,37 +3,48 @@ name: Manage Ingress Controller instances
 on:
   workflow_dispatch:
 jobs:
-  deploy-ingress-with-custom-http-snippet-config-map:
+  deploy-ingress-nginx:
     runs-on: ubuntu-latest
     environment: ingress-nginx
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Create kind cluster
-        uses: helm/kind-action@v1.8.0
-        with:
-          cluster_name: ci-cluster
+      - name: Set up kind (Kubernetes in Docker)
+        uses: helm/kind-action@v1.9.0
 
-      - name: Verify cluster
-        run: kubectl get nodes
-
-      - name: Deploy ingress-nginx with secret snippet
-        env:
-          HTTP_SNIPPET: ${{ vars.HTTP_SNIPPET }}
+      - name: Create temporary file for http-snippet
         run: |
-          # Write the secret value to a temporary file
-          echo -e "$HTTP_SNIPPET" > snippet.txt
+          mkdir -p tmp
+          # Write the secret into the file exactly as-is
+          printf "%s\n" "${{ secrets.NGINX_HTTP_SNIPPET }}" > tmp/http-snippet.conf
+          echo "===== snippet content ====="
+          cat tmp/http-snippet.conf
+          echo "==========================="
 
+      - name: Add ingress-nginx repo
+        run: |
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+          helm repo update
 
+      - name: Install ingress-nginx with Helm using secret snippet
+        run: |
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace ingress-nginx \
             --create-namespace \
             --version 4.13.2 \
             --values ingress/values.yaml \
-            --set-file controller.config.http-snippet=snippet.txt
+            --set-file controller.config.http-snippet=tmp/http-snippet.conf
 
-      - name: Verify install with config map from environment secret
+      - name: Wait for ingress-nginx pods to be ready
         run: |
-          kubectl get cm ingress-nginx-controller -o yaml -n ingress-nginx
+          kubectl wait --namespace ingress-nginx \
+            --for=condition=Ready pods \
+            --selector=app.kubernetes.io/component=controller \
+            --timeout=180s
+
+      - name: Verify ConfigMap content
+        run: |
+          echo "===== ingress-nginx-controller ConfigMap ====="
+          kubectl get configmap ingress-nginx-controller -n ingress-nginx -o yaml | grep -A 20 "http-snippet:"
+          echo "=============================================="
