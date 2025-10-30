@@ -36,13 +36,6 @@ jobs:
             --values ingress/values.yaml \
             --set-file controller.config.http-snippet=tmp/http-snippet.conf
 
-      - name: Wait for ingress-nginx pods to be ready
-        run: |
-          kubectl wait --namespace ingress-nginx \
-            --for=condition=Ready pods \
-            --selector=app.kubernetes.io/component=controller \
-            --timeout=180s
-
       - name: Verify ConfigMap content
         run: |
           echo "===== ingress-nginx-controller ConfigMap ====="
