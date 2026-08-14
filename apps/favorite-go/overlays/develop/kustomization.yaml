@@ -4,12 +4,13 @@ kind: Kustomization
 namespace: favorite-go-develop
 
 resources:
-  - ../../base
+- ../../base
 
 images:
-  - name: sibelly/favorite-go
-    newTag: 29889c2
+- name: sibelly/favorite-go
+  newName: sibelly/favorite-go
+  newTag: e3a9a15
 
 replicas:
-  - name: favorite-go
-    count: 1
+- count: 1
+  name: favorite-go
