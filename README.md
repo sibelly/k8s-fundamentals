@@ -2,7 +2,7 @@
 
 - Full cycle live -> https://www.youtube.com/watch?v=oxWEVQP5_Rg
 
-![k8s-scheme](https://github.com/sibelly/k8s-fundamentals/blob/main/resources/k8s-scheme.png?raw=true)
+![k8s-scheme](./.github/assets/k8s-scheme.png?raw=true)
 
 
 ### Pod
