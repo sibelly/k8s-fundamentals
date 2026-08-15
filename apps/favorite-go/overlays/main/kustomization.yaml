@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: favorite-go-main
+
+resources:
+- ../../base
+
+images:
+- name: sibelly/favorite-go
+  newName: sibelly/favorite-go
+  newTag: e3a9a15
+
+replicas:
+- count: 1
+  name: favorite-go
