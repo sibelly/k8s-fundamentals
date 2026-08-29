@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vllm-models
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: hf-token-secret
+# type: Opaque
+# stringData:
+#   token: YOUR_TOKEN
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-server
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vllm
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vllm
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: vllm
+        #image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:latest
+        image: vllm/vllm-openai-cpu:latest-arm64
+        command: ["/bin/sh", "-c"]
+        args:
+          - >-
+            vllm serve HuggingFaceTB/SmolLM2-135M-Instruct
+            --dtype=float32
+            --max-model-len=64
+            --max-num-batched-tokens=64
+            --max-num-seqs=1
+            --enforce-eager
+            --kv-cache-memory-bytes=32M
+            --no-enable-prefix-caching
+        env:
+          - name: VLLM_ENABLE_V1_MULTIPROCESSING
+            value: "0"
+          - name: OMP_NUM_THREADS
+            value: "1"
+        ports:
+          - containerPort: 8000
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 5
+          failureThreshold: 120
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 5
+          failureThreshold: 3
+        volumeMounts:
+          - name: llm-storage
+            mountPath: /root/.cache/huggingface
+          - name: shared-memory
+            mountPath: /dev/shm
+      volumes:
+      - name: llm-storage
+        persistentVolumeClaim:
+          claimName: vllm-models
+      - name: shared-memory
+        emptyDir:
+          medium: Memory
+          sizeLimit: 512Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm-server
+spec:
+  selector:
+    app.kubernetes.io/name: vllm
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: ClusterIP
